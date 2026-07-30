@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第二学期综合测验</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f5f5f5; 
+  padding: 16px; 
+  line-height: 1.6;
+  color: #333;
+}
+.container { max-width: 720px; margin: 0 auto; }
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 4px;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: #333; }
+.btn.primary { background: #333; color: #fff; border-color: #333; }
+.btn.selected { border-color: #333; background: #f0f0f0; }
+.btn.correct { border-color: #10b981; background: #d1fae5; color: #065f46; }
+.btn.wrong { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  margin: 6px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.15s;
+}
+.option-btn:hover { border-color: #333; background: #f9fafb; }
+.option-btn.selected { border-color: #333; background: #f3f4f6; }
+.option-btn.correct { border-color: #10b981; background: #ecfdf5; }
+.option-btn.wrong { border-color: #ef4444; background: #fef2f2; }
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+}
+input[type="text"]:focus { outline: none; border-color: #333; }
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  margin: 12px 0 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #333;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+.meta { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+.question { font-size: 16px; font-weight: 500; margin-bottom: 16px; line-height: 1.6; }
+.answer-box {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #4b5563;
+  display: none;
+}
+.answer-box.show { display: block; }
+
+.score-big { font-size: 48px; font-weight: 700; text-align: center; }
+.stats { display: flex; justify-content: center; gap: 24px; margin: 16px 0 24px; }
+.stat { text-align: center; }
+.stat-num { font-size: 20px; font-weight: 600; }
+.stat-label { font-size: 12px; color: #6b7280; }
+
+.wrong-item {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+.wrong-meta { font-size: 11px; color: #9ca3af; margin-bottom: 4px; }
+.wrong-q { font-size: 14px; margin-bottom: 4px; }
+.wrong-ans { font-size: 13px; }
+.ans-ok { color: #10b981; font-weight: 600; }
+.ans-bad { color: #ef4444; font-weight: 600; }
+
+.filter-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #fff;
+}
+.chip:hover, .chip.active { background: #333; color: #fff; border-color: #333; }
+
+.mode-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.mode-card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  background: #fff;
+}
+.mode-card:hover, .mode-card.active { border-color: #333; background: #f9fafb; }
+.mode-card h4 { font-size: 14px; margin-bottom: 2px; }
+.mode-card p { font-size: 12px; color: #6b7280; margin: 0; }
+
+.hidden { display: none !important; }
+.center { text-align: center; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="container">
+
+<!-- 开始页面 -->
+<div id="startScreen">
+  <div class="card center">
+    <div class="title">📚 第二学期综合测验</div>
+    <div class="subtitle">史课 · 字课 · 文课</div>
+
+    <div class="filter-row">
+      <span class="chip active" onclick="selCat(this,'all')">全部</span>
+      <span class="chip" onclick="selCat(this,'史课')">史课</span>
+      <span class="chip" onclick="selCat(this,'字课')">字课</span>
+      <span class="chip" onclick="selCat(this,'文课')">文课</span>
+    </div>
+
+    <div class="mode-row">
+      <div class="mode-card active" onclick="selMode(this,'all')">
+        <h4>全部题目</h4>
+        <p id="cAll">143题</p>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'r30')">
+        <h4>随机30题</h4>
+        <p>快速测验</p>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'r50')">
+        <h4>随机50题</h4>
+        <p>中等强度</p>
+      </div>
+    </div>
+
+    <button class="btn primary" style="padding:12px 32px;font-size:16px;" onclick="start()">开始考试</button>
+  </div>
+</div>
+
+<!-- 答题页面 -->
+<div id="quizScreen" class="hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:600;">答题中</span>
+      <span id="prog" style="font-size:13px;color:#6b7280;">1 / 143</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="pfill" style="width:0%"></div></div>
+    <div id="qbox"></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;gap:10px;">
+    <button class="btn" id="prevBtn" onclick="prev()" disabled>上一题</button>
+    <button class="btn primary" id="subBtn" onclick="submit()">提交答案</button>
+    <button class="btn primary hidden" id="nextBtn" onclick="next()">下一题</button>
+  </div>
+</div>
+
+<!-- 结果页面 -->
+<div id="resultScreen" class="hidden">
+  <div class="card center">
+    <div class="score-big" id="scoreNum">0</div>
+    <div class="subtitle">分</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="sCorrect">0</div><div class="stat-label">正确</div></div>
+      <div class="stat"><div class="stat-num" id="sWrong">0</div><div class="stat-label">错误</div></div>
+      <div class="stat"><div class="stat-num" id="sTotal">0</div><div class="stat-label">总计</div></div>
+    </div>
+  </div>
+  <div id="reviewBox"></div>
+  <div class="center mt-16">
+    <button class="btn" onclick="restart()">重新测验</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const DATA = [{"id": 0, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 1, "type": "true_false", "question": "道家和道教是一回事。（   ）", "options": [], "answer": "false"}, {"id": 1, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 2, "type": "single", "question": "老道長張至順，他說道號叫（   ）。", "options": [{"letter": "A", "text": "米精子"}, {"letter": "B", "text": "米晶子"}, {"letter": "C", "text": "丘阳子"}], "answer": "B"}, {"id": 2, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 3, "type": "single", "question": "老道長的著作叫（   ）", "options": [{"letter": "A", "text": "《炁体源流》"}, {"letter": "B", "text": "《玄隱遺密》"}, {"letter": "C", "text": "《醫學衷中參西錄》"}], "answer": "A"}, {"id": 3, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 4, "type": "single", "question": "張至順道長（   ）字，可以讀懂徐老師的書。", "options": [{"letter": "A", "text": "认"}, {"letter": "B", "text": "写"}, {"letter": "C", "text": "识"}], "answer": "C"}, {"id": 4, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 5, "type": "fill_blank", "question": "張至順道長生於（   ）年。", "options": [], "answer": "1921"}, {"id": 5, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 6, "type": "true_false", "question": "中醫的很多理論是建立在道家自我修行、自我感覺的基礎上。（   ）", "options": [], "answer": "true"}, {"id": 6, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 7, "type": "single", "question": "《瀕湖脈學》的\"瀕湖\"是（   ）的一個號。", "options": [{"letter": "A", "text": "张仲景"}, {"letter": "B", "text": "华佗"}, {"letter": "C", "text": "李时珍"}], "answer": "C"}, {"id": 7, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 8, "type": "true_false", "question": "唯心和唯物沒有明確的界限，有形的東西可以化解成無形，無形東西可凝聚成有形。當我們過度寄情於有形的物質、錢財的時候，我們的心血、心神、心氣都會耗光。（   ）", "options": [], "answer": "true"}, {"id": 8, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 9, "type": "single", "question": "除了八部金剛長壽功以外，老道長傳授給我們，更多的是（   ）的那種感召和感動。", "options": [{"letter": "A", "text": "心灵层面"}, {"letter": "B", "text": "精神层面"}, {"letter": "C", "text": "物质层面"}], "answer": "B"}, {"id": 9, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 10, "type": "single", "question": "道家的辟穀其實是一個用（   ）來壓迫（ ）的這麼一個訓練。", "options": [{"letter": "A", "text": "魄、魂"}, {"letter": "B", "text": "魂、魄"}, {"letter": "C", "text": "神、誌"}], "answer": "B"}, {"id": 10, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 11, "type": "multiple", "question": "按照道家大五穀分類，以下哪些是土穀？（   ）", "options": [{"letter": "A", "text": "玉米 B土豆 C山药 D高粱 E莲子"}], "answer": "ABC"}, {"id": 11, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 12, "type": "fill_blank", "question": "按照道家大五穀分類，以下哪些是木穀？（   ）", "options": [], "answer": "ABD"}, {"id": 12, "category": "史课", "section": "1-12-14史课练习-张至顺", "num": 13, "type": "multiple", "question": "按照道家大五穀分類，以下哪些是火穀？（   ）", "options": [{"letter": "A", "text": "莲子 B水稻 C高粱 D麦子 E穀子"}], "answer": "ABCDE"}, {"id": 13, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 1, "type": "true_false", "question": "很多人不是被病毒和細菌殺死的，是沒有處理好人際關係，造成了自己情緒、情感的傷害，然後產生了一些心理問題，產生了一些生理的疾病。（   ）", "options": [], "answer": "true"}, {"id": 14, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 2, "type": "fill_blank", "question": "中醫認識的很高級，在能量的背後還有東西。這就是我們講的\"精氣神\"的（   ）的概念。", "options": [], "answer": "C"}, {"id": 15, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 3, "type": "fill_blank", "question": "（   ）是心的募穴。 A巨闕 B膻中 C極泉", "options": [], "answer": "A"}, {"id": 16, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 4, "type": "fill_blank", "question": "《莊子》中提到的二禽戲指的是哪二禽？（   ）", "options": [], "answer": "AC"}, {"id": 17, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 5, "type": "fill_blank", "question": "最早提出五禽戲之名的典籍是（   ）？", "options": [], "answer": "A"}, {"id": 18, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 6, "type": "single", "question": "（   ）戲是補脾胃的？", "options": [{"letter": "A", "text": "熊"}, {"letter": "B", "text": "虎 C鸟"}], "answer": "A"}, {"id": 19, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 7, "type": "fill_blank", "question": "（   ）戲是舒暢肝膽經的？ A 鹿 B 虎 C鸟", "options": [], "answer": "A"}, {"id": 20, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 8, "type": "true_false", "question": "氣的概念衹是一個溫度的高低，你說溫度高就有氣，溫度低了就沒氣。（   ）", "options": [], "answer": "false"}, {"id": 21, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 9, "type": "single", "question": "（   ）就是心經的搏動處，（ ）就是心包經的搏動處。", "options": [{"letter": "A", "text": "太淵，神門 B神門，大陵 C太淵，大陵"}], "answer": "B"}, {"id": 22, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 10, "type": "multiple", "question": "切不光是要切寸口脈，而且要去切身體上的（   ）", "options": [{"letter": "A", "text": "背俞穴"}, {"letter": "B", "text": "腹募穴"}, {"letter": "C", "text": "三部九侯的動脈點"}], "answer": "ABC"}, {"id": 23, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 11, "type": "fill_blank", "question": "正常人應該是發力的時候柔軟的（   ）變成（ ）", "options": [], "answer": "A"}, {"id": 24, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 12, "type": "true_false", "question": "中醫是以人治人，一定要把自己修煉的很健康、很有能量。然後用自個兒的氣給別人去把他的病邪趕走了。（   ）", "options": [], "answer": "false"}, {"id": 25, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 13, "type": "true_false", "question": "\"醫不叩門\"就是說，如果離開病人的主動配合或者是發自內心的信任，醫生很難施展自己的功夫。（   ）", "options": [], "answer": "true"}, {"id": 26, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 14, "type": "fill_blank", "question": "\"聞\"的背後有一種通感，聞其實是兩個：一個是（   ），一個是（   ） A 听觉 B嗅觉 C味觉", "options": [], "answer": "A"}, {"id": 27, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 15, "type": "single", "question": "（   ）往往是正邪交爭比較劇烈的時候，而且基本上是邪氣重", "options": [{"letter": "A", "text": "陽性反應點"}, {"letter": "B", "text": "中性反應點"}, {"letter": "C", "text": "陰性反應點"}], "answer": "A"}, {"id": 28, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 16, "type": "true_false", "question": "中醫是以人治人，一定要把自己修煉的很健康、很有能量。然後用自個兒的氣給別人去把他的病邪趕走了。（   ）", "options": [], "answer": "false"}, {"id": 29, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 17, "type": "true_false", "question": "\"醫不叩門\"就是說，如果離開病人的主動配合或者是發自內心的信任，醫生很難施展自己的功夫。（   ）", "options": [], "answer": "true"}, {"id": 30, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 18, "type": "single", "question": "\"聞\"的背後有一種通感，聞其實是兩個：一個是（   ），一個是（   ）", "options": [{"letter": "A", "text": "听觉"}, {"letter": "B", "text": "嗅觉 C味觉"}], "answer": "A"}, {"id": 31, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 19, "type": "true_false", "question": "中性反應點需要借助于醫生的幫助、導引，把氣導引過來，然後把這個東西消滅掉。（   ）", "options": [], "answer": "true"}, {"id": 32, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 20, "type": "multiple", "question": "排病氣的幾個方法包含以下哪些？（   ）", "options": [{"letter": "A", "text": "给邪气以出路"}, {"letter": "B", "text": "开门 C以痛为愈"}], "answer": "AB"}, {"id": 33, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 21, "type": "fill_blank", "question": "期門是肝的募穴，代表了肝氣聚集的地方，它的位置在第（   ）肋間隙。", "options": [], "answer": "6"}, {"id": 34, "category": "史课", "section": "1-15-18史课练习-周稔丰", "num": 22, "type": "fill_blank", "question": "開臓門是要開（   ），開腑門是要開（ ）。", "options": [], "answer": "B"}, {"id": 35, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 23, "type": "single", "question": "《傷寒論》中的小柴胡湯中的姜用的是（   ）", "options": [{"letter": "A", "text": "生姜"}, {"letter": "B", "text": "干姜 C炮姜"}], "answer": "A"}, {"id": 36, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 24, "type": "multiple", "question": "裴永清老師在給徐老師講治感冒時說，治療感冒除了診斷對，開方對，還需要注意（   ）。", "options": [{"letter": "A", "text": "服藥的方法"}, {"letter": "B", "text": "煎煮的方法"}, {"letter": "C", "text": "用藥的方法"}], "answer": "AB"}, {"id": 37, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 25, "type": "single", "question": "裴老師使用（   ）系列的方剂治疗水气病", "options": [{"letter": "A", "text": "桂枝剂"}, {"letter": "B", "text": "柴胡剂"}, {"letter": "C", "text": "苓桂剂"}], "answer": "C"}, {"id": 38, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 26, "type": "fill_blank", "question": "裴老師治療痰濕，或者是這種食積過重導致的哮喘，用的基本方是（   ）", "options": [], "answer": "A"}, {"id": 39, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 27, "type": "single", "question": "主持編修《醫宗金鑒》的是（   ）", "options": [{"letter": "A", "text": "吳謙"}, {"letter": "B", "text": "吳鞠通"}, {"letter": "C", "text": "張仲景"}], "answer": "A"}, {"id": 40, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 28, "type": "single", "question": "劉渡舟老師主持修訂了（   ），是在宋朝第一次官修傷寒論以後的第二次的整理。", "options": [{"letter": "A", "text": "伤寒论"}, {"letter": "B", "text": "醫宗金鑒"}, {"letter": "C", "text": "溫病條辨"}], "answer": "A"}, {"id": 41, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 29, "type": "single", "question": "《溫病條辨》的作者是（   ）。", "options": [{"letter": "A", "text": "吳謙"}, {"letter": "B", "text": "吳鞠通 C張仲景"}], "answer": "B"}, {"id": 42, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 30, "type": "single", "question": "一些更年期的婦女說自己身上烘一下熱，然後發冷，這叫（   ）。", "options": [{"letter": "A", "text": "寒熱往來"}, {"letter": "B", "text": "潮熱"}, {"letter": "C", "text": "惡"}], "answer": "B"}, {"id": 43, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 31, "type": "single", "question": "《傷寒論》的條文一共有（   ）條。", "options": [{"letter": "A", "text": "398"}, {"letter": "B", "text": "113"}, {"letter": "C", "text": "256"}], "answer": "A"}, {"id": 44, "category": "史课", "section": "1-20-22史课练习-裴永清", "num": 32, "type": "single", "question": "中藥除了湯藥，還有丸散膏丹等劑型，其中（   ）特別適合于滋補。", "options": [{"letter": "A", "text": "湯藥"}, {"letter": "B", "text": "水蜜丸"}, {"letter": "C", "text": "膏劑"}], "answer": "C"}, {"id": 45, "category": "字课", "section": "1-12 字课练习-疮疡", "num": 1, "type": "multiple", "question": "一個人，被釘子紮了腳，傷口紅腫化膿，很多天都不好，以下看法正確的是（   ）", "options": [{"letter": "A", "text": "感染了"}, {"letter": "B", "text": "最好去清创、消毒 C不用管也能自愈"}, {"letter": "D", "text": "成疮疡了"}], "answer": "ABD"}, {"id": 46, "category": "字课", "section": "1-12 字课练习-疮疡", "num": 2, "type": "multiple", "question": "關於虛邪，以下看法正確的是（   ）", "options": [{"letter": "A", "text": "通常隨風進入人體B、有外傷的情況，更容易進入人體C、新冠病毒是虛邪D、寒氣是虛邪"}], "answer": "ABCD"}, {"id": 47, "category": "字课", "section": "1-12 字课练习-疮疡", "num": 3, "type": "multiple", "question": "小李，男，25歲，長了一臉青春痘，他該怎麼做（   ）", "options": [{"letter": "A", "text": "聽說有一款外用藥膏很好用，可以用來外治B、多喝點綠茶降火C、少熬夜"}, {"letter": "D", "text": "該找女朋友了"}], "answer": "CD"}, {"id": 48, "category": "字课", "section": "1-12 字课练习-疮疡", "num": 4, "type": "multiple", "question": "得了痔瘡，以下做法妥當的是（   ）", "options": [{"letter": "A", "text": "少吃辣"}, {"letter": "B", "text": "尽快切除"}, {"letter": "C", "text": "可以找个好治疗师刮痧"}, {"letter": "D", "text": "调节情绪"}], "answer": "ACD"}, {"id": 49, "category": "字课", "section": "1-12 字课练习-疮疡", "num": 5, "type": "single", "question": "外傷感染後抽搐，這是影響到了（   ）", "options": [{"letter": "A", "text": "心神"}, {"letter": "B", "text": "心胞"}, {"letter": "C", "text": "肝"}, {"letter": "D", "text": "肾"}], "answer": "B"}, {"id": 50, "category": "字课", "section": "1-13字课练习-痞满", "num": 1, "type": "true_false", "question": "導致痞滿的是水飲、痰濕、瘀血等有形有質的物質。（   ）", "options": [], "answer": "false"}, {"id": 51, "category": "字课", "section": "1-13字课练习-痞满", "num": 2, "type": "true_false", "question": "艾灸時應該感到被灸的局部熱熱的。（   ）", "options": [], "answer": "false"}, {"id": 52, "category": "字课", "section": "1-13字课练习-痞满", "num": 3, "type": "true_false", "question": "家庭關係中，夫妻關係比親子關係更為重要。（   ）", "options": [], "answer": "true"}, {"id": 53, "category": "字课", "section": "1-13字课练习-痞满", "num": 4, "type": "single", "question": "患者感覺心臓不舒服，身體累，背上有巴掌大的地方感覺發冷，說明患者可能存在（   ）", "options": [{"letter": "A", "text": "水痞 B热痞 C痰痞 D寒痞"}], "answer": "A"}, {"id": 54, "category": "字课", "section": "1-14字课练习-咳嗽", "num": 1, "type": "multiple", "question": "以下關於咳嗽，正確的是（   ）", "options": [{"letter": "A", "text": "咳有聲，嗽無聲"}, {"letter": "B", "text": "咳有痰，嗽無痰"}, {"letter": "B", "text": "咳主要是肺的問題，嗽主要是胃的問題"}, {"letter": "D", "text": "咳不一定有痰"}], "answer": "CD"}, {"id": 55, "category": "字课", "section": "1-14字课练习-咳嗽", "num": 2, "type": "multiple", "question": "孩子上了游泳班，回來一直咳嗽，以下做法正確的是（   ）", "options": [{"letter": "A", "text": "先暂停游泳 B孩子体质太差，要多游泳，加强锻炼"}], "answer": "AD"}, {"id": 56, "category": "字课", "section": "1-14字课练习-咳嗽", "num": 3, "type": "multiple", "question": "以下說法正確的是（   ）", "options": [{"letter": "A", "text": "治療後咳嗽加重，不用擔心，是順證B、咳嗽的喘不上來氣，要先止咳C、治療後不咳嗽了，不一定是快好了D、咳嗽了2個月，精神體力正常，是順證，不需要治療"}], "answer": "BC"}, {"id": 57, "category": "字课", "section": "1-14字课练习-咳嗽", "num": 5, "type": "multiple", "question": "对于咳嗽的理解，正确的是（   ）", "options": [{"letter": "A", "text": "是从食道往外排东西 B治疗要控制饮食 C治疗要消胃的积滞"}], "answer": "ABCD"}, {"id": 58, "category": "字课", "section": "1-15字课练习-哮喘", "num": 1, "type": "multiple", "question": "以下正確的是（   ）", "options": [{"letter": "A", "text": "過敏性哮喘是由於過敏原，要終生避免過敏原"}, {"letter": "B", "text": "過敏性哮喘根本原因在於正氣不足"}, {"letter": "C", "text": "哮主要是因為痰多，阻塞氣道"}, {"letter": "D", "text": "喘主要是因為痰多，喘不上氣"}], "answer": "BC"}, {"id": 59, "category": "字课", "section": "1-15字课练习-哮喘", "num": 2, "type": "multiple", "question": "孩子得了哮喘，以下做法正確的是（   ）", "options": [{"letter": "A", "text": "可以用激素救急"}, {"letter": "B", "text": "只能終生用藥"}, {"letter": "C", "text": "需要調整飲食"}, {"letter": "D", "text": "可以適當多曬太陽"}], "answer": "ABC"}, {"id": 60, "category": "字课", "section": "1-15字课练习-哮喘", "num": 3, "type": "multiple", "question": "以下關於肺，正確的是（   ）", "options": [{"letter": "A", "text": "肺司呼吸，呼氣和吸氣都管"}, {"letter": "B", "text": "肺只管吸氣"}, {"letter": "C", "text": "肺只管呼氣"}, {"letter": "D", "text": "肺功能越好，呼吸越深"}], "answer": "AD"}, {"id": 61, "category": "字课", "section": "1-15字课练习-哮喘", "num": 4, "type": "multiple", "question": "以下關於哮喘，正確的是（   ）", "options": [{"letter": "A", "text": "哮發生在呼氣"}, {"letter": "B", "text": "哮發生在吸氣"}, {"letter": "C", "text": "喘發生在呼氣"}, {"letter": "D", "text": "喘發生在吸氣"}], "answer": "AD"}, {"id": 62, "category": "字课", "section": "1-16字课练习-眩晕", "num": 1, "type": "multiple", "question": "下列症狀屬於眩的是（   ）", "options": [{"letter": "A", "text": "蹲的時間久了一站起來眼前發黑"}, {"letter": "B", "text": "從床上坐起來感覺天旋地轉"}, {"letter": "C", "text": "飛蚊症"}, {"letter": "D", "text": "老花眼"}], "answer": "ACD"}, {"id": 63, "category": "字课", "section": "1-16字课练习-眩晕", "num": 2, "type": "multiple", "question": "解決外陰瘙癢，有效的方法是（   ）", "options": [{"letter": "A", "text": "肝經刮痧"}, {"letter": "B", "text": "陰道沖洗"}, {"letter": "C", "text": "保持心情舒暢"}, {"letter": "D", "text": "內褲消毒"}], "answer": "AC"}, {"id": 64, "category": "字课", "section": "1-16字课练习-眩晕", "num": 3, "type": "multiple", "question": "入目或連接目系的經絡有（   ）", "options": [{"letter": "A", "text": "任脈"}, {"letter": "B", "text": "肝經"}, {"letter": "C", "text": "心經"}, {"letter": "D", "text": "胃經"}], "answer": "ABC"}, {"id": 65, "category": "字课", "section": "1-16字课练习-眩晕", "num": 4, "type": "multiple", "question": "防治暈車暈船的有效方法是（   ）", "options": [{"letter": "A", "text": "掐內關"}, {"letter": "B", "text": "吃暈車藥"}, {"letter": "C", "text": "喝薑湯"}, {"letter": "D", "text": "治胃"}], "answer": "ACD"}, {"id": 66, "category": "字课", "section": "1-16字课练习-眩晕", "num": 5, "type": "multiple", "question": "下列哪些人屬於失精家（   ）", "options": [{"letter": "A", "text": "長期腹瀉"}, {"letter": "B", "text": "過度手淫"}, {"letter": "C", "text": "長期白帶量多"}, {"letter": "D", "text": "月經淋漓不盡"}], "answer": "ABCD"}, {"id": 67, "category": "字课", "section": "1-17字课练习-癥瘕", "num": 1, "type": "multiple", "question": "對於\"中醫讓人糊里糊塗地活，西醫讓人明明白白地死\"這句話，以下理解正確的是（   ）", "options": [{"letter": "A", "text": "中醫診斷比較抽象，所以有一類人看不懂"}, {"letter": "B", "text": "中醫喜歡故弄玄虛，所以診斷模糊"}, {"letter": "C", "text": "西醫診斷非常精確，所以讓人看了就能知道問題的原因"}, {"letter": "D", "text": "西醫診斷很精確，但是很多時候只在表像"}], "answer": "AD"}, {"id": 68, "category": "字课", "section": "1-17字课练习-癥瘕", "num": 2, "type": "multiple", "question": "以下正確的是（   ）", "options": [{"letter": "A", "text": "劉女士做了1個月艾灸，體檢發現子宮肌瘤，是灸壞了灸出來的"}, {"letter": "B", "text": "身體裏的腫瘤，可能最早的原因是很多年前的一次受寒"}, {"letter": "C", "text": "孩子脊柱側彎，應該儘早做矯正手術"}, {"letter": "D", "text": "孩子脊柱側彎，可能跟飲食不當有關"}], "answer": "BD"}, {"id": 69, "category": "字课", "section": "1-17字课练习-癥瘕", "num": 3, "type": "multiple", "question": "以下關於癥，準確的是（   ）", "options": [{"letter": "A", "text": "身體裹一按就跑的結B、身體裏固定不動的結"}, {"letter": "C", "text": "摸上去質地很軟D、摸上去質地比較硬"}], "answer": "BD"}, {"id": 70, "category": "字课", "section": "1-17字课练习-癥瘕", "num": 4, "type": "single", "question": "易初始素裹的始，是（   ）", "options": [{"letter": "A", "text": "未見氣也"}, {"letter": "B", "text": "始見氣也"}, {"letter": "C", "text": "始見形也"}, {"letter": "D", "text": "有形有質也"}], "answer": "C"}, {"id": 71, "category": "字课", "section": "1-18字课练习-积聚", "num": 1, "type": "multiple", "question": "關於症瘕積聚裏的積，以下正確的是（   ）", "options": [{"letter": "A", "text": "食積"}, {"letter": "B", "text": "疳積"}, {"letter": "C", "text": "腫瘤"}, {"letter": "D", "text": "癌"}], "answer": "CD"}, {"id": 72, "category": "字课", "section": "1-18字课练习-积聚", "num": 2, "type": "multiple", "question": "關於症瘕積聚裏的聚，以下正確的是（   ）", "options": [{"letter": "A", "text": "吵架生氣，氣得肝疼"}, {"letter": "B", "text": "吹空調了，感覺後背心發涼"}, {"letter": "C", "text": "肚子裏的痰結"}, {"letter": "D", "text": "吃多了脹氣"}], "answer": "ABD"}, {"id": 73, "category": "字课", "section": "1-18字课练习-积聚", "num": 3, "type": "multiple", "question": "劉女士得了子宮肌瘤，以下正確的是（   ）", "options": [{"letter": "A", "text": "最早可能就是因為生了一口悶氣"}, {"letter": "B", "text": "可能有過痛經"}, {"letter": "C", "text": "手術摘掉就行了"}, {"letter": "D", "text": "等月經沒了就好了"}], "answer": "AB"}, {"id": 74, "category": "字课", "section": "1-18字课练习-积聚", "num": 4, "type": "single", "question": "李女士查出癌症，出去旅遊半年，回來後發現癌症沒了。以下說法，正確的是（   ）", "options": [{"letter": "A", "text": "旅遊可以治癌症"}, {"letter": "B", "text": "醫院誤診了"}, {"letter": "C", "text": "她可能是心情好了，所以問題減輕了"}, {"letter": "D", "text": "她的癌完全好了"}], "answer": "C"}, {"id": 75, "category": "字课", "section": "1-19字课练习-疥癣", "num": 1, "type": "multiple", "question": "以下屬於\"正氣存內，邪不可幹\"的是（   ）", "options": [{"letter": "A", "text": "朝五晚九的作息時間"}, {"letter": "B", "text": "喝消毒液殺滅體內病毒"}, {"letter": "C", "text": "喝雞湯預防感冒"}, {"letter": "D", "text": "保持恬淡虛無的心態"}], "answer": "AD"}, {"id": 76, "category": "字课", "section": "1-19字课练习-疥癣", "num": 2, "type": "multiple", "question": "以下屬於\"虛邪賊風，避之有時\"的是（   ）", "options": [{"letter": "A", "text": "睡覺前檢查窗戶是否關好"}, {"letter": "B", "text": "疫情期間出門戴口罩"}, {"letter": "C", "text": "對花粉過敏的人不要去賞花"}, {"letter": "D", "text": "夏天掛蚊帳防蚊"}], "answer": "AB"}, {"id": 77, "category": "字课", "section": "1-19字课练习-疥癣", "num": 3, "type": "multiple", "question": "腳上長了癬，以下說法正確的是（   ）", "options": [{"letter": "A", "text": "體內有濕氣"}, {"letter": "B", "text": "應該抹藥膏殺滅真菌"}, {"letter": "C", "text": "要勤洗腳"}, {"letter": "D", "text": "經常摩腹對恢復有幫助"}], "answer": "AD"}, {"id": 78, "category": "字课", "section": "1-19字课练习-疥癣", "num": 4, "type": "single", "question": "以下關於疥蟲，錯誤的是（   ）", "options": [{"letter": "A", "text": "夜間活動劇烈"}, {"letter": "B", "text": "在宿主皮膚內挖掘隧道"}, {"letter": "C", "text": "疥蟲是微生物"}, {"letter": "D", "text": "硫磺可以殺死疥蟲"}], "answer": "C"}, {"id": 79, "category": "字课", "section": "1-20字课练习-性命", "num": 1, "type": "multiple", "question": "關於性命的性，以下正確的是（   ）", "options": [{"letter": "A", "text": "跟性能力有關"}, {"letter": "B", "text": "是人的心理活動"}, {"letter": "C", "text": "包括人的神"}, {"letter": "D", "text": "包括人的意識"}], "answer": "BCD"}, {"id": 80, "category": "字课", "section": "1-20字课练习-性命", "num": 2, "type": "multiple", "question": "下面說法正確的是（   ）", "options": [{"letter": "A", "text": "衰老是正常的生命階段，讓人保持青春的科技手段是有代價的"}, {"letter": "B", "text": "命苦要努力抗爭，我命由我不由天"}, {"letter": "C", "text": "命苦要接受，順應天命，改善運氣"}, {"letter": "D", "text": "知天達命是要去算命，提前預知自己的命運"}], "answer": "AC"}, {"id": 81, "category": "字课", "section": "1-20字课练习-性命", "num": 3, "type": "multiple", "question": "關於女子的生命規律，以下錯誤的是（   ）", "options": [{"letter": "A", "text": "以7年為一個週期變化"}, {"letter": "B", "text": "以8年為一個週期變化"}, {"letter": "C", "text": "35開始腎氣虛"}, {"letter": "D", "text": "56喪失生育能力"}], "answer": "BCD"}, {"id": 82, "category": "字课", "section": "1-20字课练习-性命", "num": 4, "type": "multiple", "question": "關於認命，以下正確的是（   ）", "options": [{"letter": "A", "text": "每個人的命是註定的，如果命不好只能認慫"}, {"letter": "B", "text": "認命是要認清天命的規律"}, {"letter": "C", "text": "認命是要認清自己的身體底子"}, {"letter": "D", "text": "認命是要認清自己的命運"}], "answer": "BC"}, {"id": 83, "category": "字课", "section": "1-21字课练习-精神", "num": 1, "type": "multiple", "question": "以下做法會導致傷精的是（   ）", "options": [{"letter": "A", "text": "感冒後期咳嗽吐痰"}, {"letter": "B", "text": "為了減肥，摳嗓子眼嘔吐"}, {"letter": "C", "text": "吃了油膩的拉肚子"}, {"letter": "D", "text": "每次月經兩周才乾淨"}], "answer": "BD"}, {"id": 84, "category": "字课", "section": "1-21字课练习-精神", "num": 2, "type": "multiple", "question": "孕期的准媽媽合適的做法是（   ）", "options": [{"letter": "A", "text": "看美好的事物"}, {"letter": "B", "text": "雖然噁心，但也要勉強吃一點，少吃多餐"}, {"letter": "C", "text": "多吃營養高的食物"}, {"letter": "D", "text": "多吃自己喜歡的食物"}], "answer": "AB"}, {"id": 85, "category": "字课", "section": "1-21字课练习-精神", "num": 3, "type": "multiple", "question": "以下對精的認識正確的是（   ）", "options": [{"letter": "A", "text": "精是父母給的，出生以後就在逐漸減少B、精是指男性的精子和女性的卵子C、後天的水穀之精能夠充養先天之精D、母乳的品質對孩子的精的積累至關重要"}], "answer": "CD"}, {"id": 86, "category": "字课", "section": "1-21字课练习-精神", "num": 4, "type": "multiple", "question": "以下對神的認識正確的是（   ）", "options": [{"letter": "A", "text": "精子和卵子結合的一瞬間，神就誕生了"}, {"letter": "B", "text": "精是神的物質基礎，精充才能神足"}, {"letter": "C", "text": "孩子降生的一刹那，神進入了孩子的身體"}, {"letter": "D", "text": "後天教育會影響到一個人的神"}], "answer": "ABD"}, {"id": 87, "category": "字课", "section": "1-21字课练习-精神", "num": 5, "type": "multiple", "question": "以下有可能導致神失所養的有（   ）", "options": [{"letter": "A", "text": "用腦過度"}, {"letter": "B", "text": "三餐以主食為主"}, {"letter": "C", "text": "任督脈不通"}, {"letter": "D", "text": "熬夜"}], "answer": "ACD"}, {"id": 88, "category": "字课", "section": "1-22字课练习-魂魄", "num": 1, "type": "multiple", "question": "傷魂魄的行為有（   ）", "options": [{"letter": "A", "text": "暴飲暴食"}, {"letter": "B", "text": "熬夜"}, {"letter": "C", "text": "大悲大喜"}, {"letter": "D", "text": "單相思"}], "answer": "ABCD"}, {"id": 89, "category": "字课", "section": "1-22字课练习-魂魄", "num": 2, "type": "multiple", "question": "以下屬於魄的是（   ）", "options": [{"letter": "A", "text": "胎光"}, {"letter": "B", "text": "雀陰"}, {"letter": "C", "text": "除穢"}, {"letter": "D", "text": "屍狗"}], "answer": "BCD"}, {"id": 90, "category": "字课", "section": "1-22字课练习-魂魄", "num": 3, "type": "multiple", "question": "關於魂魄，正確的是（   ）", "options": [{"letter": "A", "text": "人有三魂七魄"}, {"letter": "B", "text": "魂魄只要有缺少，人就會死"}, {"letter": "C", "text": "魂魄缺失，人會生病"}, {"letter": "D", "text": "植物人可以理解為是有魄無魂"}], "answer": "ACD"}, {"id": 91, "category": "字课", "section": "1-22字课练习-魂魄", "num": 4, "type": "multiple", "question": "以下關於人神，正確的是（   ）", "options": [{"letter": "A", "text": "人神，是人的魂魄的統稱"}, {"letter": "B", "text": "人神，是修行以後成仙的人"}, {"letter": "C", "text": "人神，是天神的延伸"}, {"letter": "D", "text": "人神，可以感應到天神"}], "answer": "ACD"}, {"id": 92, "category": "文课", "section": "1-12 文课练习-《工之僑獻琴》", "num": 1, "type": "single", "question": "以下哪一項有詞性變化？（   ）", "options": [{"letter": "A", "text": "使國工視之"}, {"letter": "B", "text": "匣而埋諸土"}, {"letter": "C", "text": "抱以適市"}, {"letter": "D", "text": "易之以百金"}], "answer": "B"}, {"id": 93, "category": "文课", "section": "1-12 文课练习-《工之僑獻琴》", "num": 2, "type": "single", "question": "以下哪個字是\"於之\"的合音？（   ）", "options": [{"letter": "A", "text": "耶"}, {"letter": "B", "text": "矣"}, {"letter": "C", "text": "諸"}, {"letter": "D", "text": "焉"}], "answer": "D"}, {"id": 94, "category": "文课", "section": "1-12 文课练习-《工之僑獻琴》", "num": 3, "type": "single", "question": "以下哪個括弧中的字讀去聲？（   ）", "options": [{"letter": "A", "text": "（易）寡人之璧"}, {"letter": "B", "text": "周（易）"}, {"letter": "C", "text": "（操）之過急"}, {"letter": "D", "text": "猗蘭（操）"}], "answer": "D"}, {"id": 95, "category": "文课", "section": "1-12 文课练习-《工之僑獻琴》", "num": 4, "type": "single", "question": "《工之僑獻琴》是一篇（   ）", "options": [{"letter": "A", "text": "駢文"}, {"letter": "B", "text": "散文"}, {"letter": "C", "text": "駢賦"}, {"letter": "D", "text": "以上都不對"}], "answer": "B"}, {"id": 96, "category": "文课", "section": "1-12 文课练习-《工之僑獻琴》", "num": 5, "type": "single", "question": "在通常情況下，以下哪種用句是允許的？（   ）", "options": [{"letter": "A", "text": "詩用他人詩原句"}, {"letter": "B", "text": "詩用他人詞原句"}, {"letter": "C", "text": "詞用他人詞原句"}, {"letter": "D", "text": "詞用他人詩原句"}], "answer": "D"}, {"id": 97, "category": "文课", "section": "1-13 文课练习-《病梅館记》", "num": 1, "type": "single", "question": "距今天最近的己亥年是（   ）", "options": [{"letter": "A", "text": "2019"}, {"letter": "B", "text": "2001"}, {"letter": "C", "text": "1989"}, {"letter": "D", "text": "1966"}, {"letter": "E", "text": "1960"}], "answer": "A"}, {"id": 98, "category": "文课", "section": "1-13 文课练习-《病梅館记》", "num": 2, "type": "single", "question": "以下哪一項詩句【不】屬於《己亥雜詩》？（   ）", "options": [{"letter": "A", "text": "避席畏聞文字獄，著書都為稻粱謀。"}, {"letter": "B", "text": "落紅不是無情物，化作春泥更護花。"}, {"letter": "C", "text": "終是落花心緒好，平生默感玉皇恩。"}, {"letter": "D", "text": "我勸天公重抖擻，不拘一格降人才。"}], "answer": "A"}, {"id": 99, "category": "文课", "section": "1-13 文课练习-《病梅館记》", "num": 3, "type": "single", "question": "以下哪一項【未】發生詞性變化？（   ）", "options": [{"letter": "A", "text": "則百不才督之縛之"}, {"letter": "B", "text": "以夭梅病梅為業以求錢也"}, {"letter": "C", "text": "未可明詔大號以繩天下之梅也"}, {"letter": "D", "text": "辟病梅之館以貯之"}], "answer": "D"}, {"id": 100, "category": "文课", "section": "1-13 文课练习-《病梅館记》", "num": 4, "type": "single", "question": "烏梅的性味是：（   ）", "options": [{"letter": "A", "text": "甘寒"}, {"letter": "B", "text": "酸涼"}, {"letter": "C", "text": "辛溫"}, {"letter": "D", "text": "鹹寒"}], "answer": "B"}, {"id": 101, "category": "文课", "section": "1-13 文课练习-《病梅館记》", "num": 5, "type": "single", "question": "什麼樣的人可以在夏天飲用酸梅湯？（   ）", "options": [{"letter": "A", "text": "舌有膩苔"}, {"letter": "B", "text": "痰瘀互結"}, {"letter": "C", "text": "津枯血燥"}, {"letter": "D", "text": "胃脘虛寒"}], "answer": "C"}, {"id": 102, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 1, "type": "single", "question": "以下說法正確的是(1-14课)：（   ）", "options": [{"letter": "A", "text": "《敕勒歌》屬於樂府詩當中的郊廟歌辭"}, {"letter": "B", "text": "《隆中對》節選自《三國演義》"}, {"letter": "C", "text": "《樂府詩集》屬於集部"}, {"letter": "D", "text": "二十四史指的是從《史記》到《清史》共二十四部歷史"}], "answer": "C"}, {"id": 103, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 2, "type": "single", "question": "以下哪一組詞語均為並列結構？（   ）", "options": [{"letter": "A", "text": "禮樂，天道，按摩，好逑"}, {"letter": "B", "text": "燕射，道理，樂府，隴畝"}, {"letter": "C", "text": "郊廟，射禦，鼓吹，針灸"}, {"letter": "D", "text": "按蹺，推拿，針砭，橫吹"}], "answer": "C"}, {"id": 104, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 3, "type": "single", "question": "按時間順序排列四種音樂形式，正確的是：（   ）", "options": [{"letter": "A", "text": "清樂、雅樂、南北曲、燕樂"}, {"letter": "B", "text": "雅樂、清樂、燕樂、南北曲"}, {"letter": "C", "text": "雅樂、南北曲、清樂、燕樂"}, {"letter": "D", "text": "燕樂、清樂、南北曲、雅樂"}], "answer": "B"}, {"id": 105, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 4, "type": "single", "question": "以下說法正確的是(1-14)：（   ）", "options": [{"letter": "A", "text": "宋詞可以稱為樂府"}, {"letter": "B", "text": "樂府就是民歌，是典型的民間文學"}, {"letter": "C", "text": "漢武帝時，郭茂倩編《樂府詩集》，整理了大量過往歷史中的樂府詩"}, {"letter": "D", "text": "雅文學終結於明清小說"}], "answer": "A"}, {"id": 106, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 5, "type": "single", "question": "《蘭亭序》、《道德經》、《隆中對》分別歸於：（   ）", "options": [{"letter": "A", "text": "集部、經部、史部"}, {"letter": "B", "text": "子部、經部、史部"}, {"letter": "C", "text": "經部、子部、集部"}, {"letter": "D", "text": "集部、子部、史部"}], "answer": "D"}, {"id": 107, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 6, "type": "single", "question": "以下哪一項發生了詞性變化？（1-15）（   ）", "options": [{"letter": "A", "text": "九合諸侯"}, {"letter": "B", "text": "好為梁父吟"}, {"letter": "C", "text": "時人莫之許"}, {"letter": "D", "text": "謂為信然"}], "answer": "A"}, {"id": 108, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 7, "type": "single", "question": "以下說法正確的是：（1-15）（   ）", "options": [{"letter": "A", "text": "昆曲指的是昆山腔，與南曲和北曲無關"}, {"letter": "B", "text": "當古音與今音不一致時，應按古音發音"}, {"letter": "C", "text": "\"三歲貫女，莫我肯顧。\"中有意動用法"}, {"letter": "D", "text": "明代以後創作的文學作品屬於俗文學"}, {"letter": "E", "text": "以上都不對"}], "answer": "E"}, {"id": 109, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 8, "type": "multiple", "question": "（多選）以下選項中有倒裝現象的是：（   ）", "options": [{"letter": "A", "text": "何陋之有"}, {"letter": "B", "text": "誠不我欺"}, {"letter": "C", "text": "無舟莫適"}, {"letter": "D", "text": "大王來何操"}], "answer": "ABD"}, {"id": 110, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 9, "type": "multiple", "question": "（多選）以下詞語中兩字都是仄聲的是：（   ）", "options": [{"letter": "A", "text": "子曰"}, {"letter": "B", "text": "十八"}, {"letter": "C", "text": "得直"}, {"letter": "D", "text": "一曲"}, {"letter": "E", "text": "樂府"}], "answer": "ABCDE"}, {"id": 111, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 10, "type": "single", "question": "以下哪項兩字都是平聲？（   ）", "options": [{"letter": "A", "text": "一方"}, {"letter": "B", "text": "屈心"}, {"letter": "C", "text": "俱全"}, {"letter": "D", "text": "皆曰"}], "answer": "C"}, {"id": 112, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 11, "type": "single", "question": "以下說法正確的是（1-16）：（   ）", "options": [{"letter": "A", "text": "以姓名稱呼陌生人相當於罵人"}, {"letter": "B", "text": "古人的號相當於他人給本人起的外號"}, {"letter": "C", "text": "姓氏就是指一個人姓什麼"}, {"letter": "D", "text": "名是名，字是字，二者沒什麼關係"}], "answer": "A"}, {"id": 113, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 12, "type": "single", "question": "以下哪一項發生了詞性變化（1-16）？（   ）", "options": [{"letter": "A", "text": "說之"}, {"letter": "B", "text": "器之"}, {"letter": "C", "text": "厭之"}, {"letter": "D", "text": "慰之"}], "answer": "B"}, {"id": 114, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 13, "type": "single", "question": "下列括弧中的字，讀仄聲的是：（   ）", "options": [{"letter": "A", "text": "不（勝）感激"}, {"letter": "B", "text": "（令）五人保其首領"}, {"letter": "C", "text": "比（興）"}, {"letter": "D", "text": "孤不度德（量）力"}], "answer": "C"}, {"id": 115, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 14, "type": "single", "question": "兩字都是入聲的一項是：（   ）", "options": [{"letter": "A", "text": "乃見"}, {"letter": "B", "text": "操守"}, {"letter": "C", "text": "董卓"}, {"letter": "D", "text": "度德"}], "answer": "D"}, {"id": 116, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 15, "type": "single", "question": "以下哪一組詞均為並列結構？（   ）", "options": [{"letter": "A", "text": "猖獗 是非 好歹 褒貶"}, {"letter": "B", "text": "豪傑歸附 躬耕 糧草"}, {"letter": "C", "text": "群眾 部署 克勤 險塞"}, {"letter": "D", "text": "智術 諸侯 傾頹厥逆"}], "answer": "A"}, {"id": 117, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 16, "type": "single", "question": "因屏人曰漢室傾頽奸臣竊命主上蒙塵孤不度德量力欲信大義於天下。以上一段文言有幾個通假字？（   ）", "options": [{"letter": "A", "text": "一個"}, {"letter": "B", "text": "兩個"}, {"letter": "C", "text": "三個"}, {"letter": "D", "text": "沒有"}], "answer": "B"}, {"id": 118, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 17, "type": "single", "question": "課文中\"國險而民附\"的\"國\"是指：（   ）", "options": [{"letter": "A", "text": "中國"}, {"letter": "B", "text": "吳國"}, {"letter": "C", "text": "國都"}, {"letter": "D", "text": "以上都不對"}], "answer": "C"}, {"id": 119, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 18, "type": "multiple", "question": "（多選）以下哪項為並列結構？（   ）", "options": [{"letter": "A", "text": "賢能"}, {"letter": "B", "text": "守成"}, {"letter": "C", "text": "曹眾"}, {"letter": "D", "text": "能言"}, {"letter": "E", "text": "人文"}], "answer": "ACD"}, {"id": 120, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 19, "type": "single", "question": "以下哪項括弧中的字讀平聲？（   ）", "options": [{"letter": "A", "text": "蓋失強（援）"}, {"letter": "B", "text": "劉備以亮有殊（量）"}, {"letter": "C", "text": "（ 令）人喪氣若此"}, {"letter": "D", "text": "（國）險而民附"}], "answer": "C"}, {"id": 121, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 20, "type": "single", "question": "以下說法正確的是（1-18）：（   ）", "options": [{"letter": "A", "text": "人文學科同時也都是藝術學科"}, {"letter": "B", "text": "《三國志》是二十四史之一"}, {"letter": "C", "text": "文藝是沒有任何功用的"}, {"letter": "D", "text": "現代主義與古典主義並無明顯區別"}], "answer": "B"}, {"id": 122, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 21, "type": "multiple", "question": "（多選）以下哪項為並列結構？(1-19)（   ）", "options": [{"letter": "A", "text": "智能"}, {"letter": "B", "text": "霸業"}, {"letter": "C", "text": "險塞"}, {"letter": "D", "text": "信義"}, {"letter": "E", "text": "存恤"}], "answer": "ACDE"}, {"id": 123, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 22, "type": "multiple", "question": "（多選）以下哪幾項括弧中的字是仄聲？(1-19)（   ）", "options": [{"letter": "A", "text": "漢室可（興）矣"}, {"letter": "B", "text": "以向（宛）洛"}, {"letter": "C", "text": "簞（食）壺漿"}, {"letter": "D", "text": "欲（信）大義於天下"}, {"letter": "E", "text": "（將）荊州之軍"}], "answer": "CE"}, {"id": 124, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 23, "type": "multiple", "question": "（多選）以下含有詞性活用的選項是：(1-19)（   ）", "options": [{"letter": "A", "text": "簞食壺漿"}, {"letter": "B", "text": "此殆天所以資將軍"}, {"letter": "C", "text": "與亮情好日密"}, {"letter": "D", "text": "漢室可興矣"}], "answer": "AC"}, {"id": 125, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 24, "type": "single", "question": "以下說法【不】正確的是：(1-19)（   ）", "options": [{"letter": "A", "text": "《魏略》是魏国人修的私史"}, {"letter": "B", "text": "張魯是張天師"}, {"letter": "C", "text": "吳會是孫權治下的一個郡"}, {"letter": "D", "text": "劉備稱帝后，定國號為漢"}, {"letter": "E", "text": "巴蜀是巴郡和蜀郡，與漢中郡同為益州治下"}], "answer": "C"}, {"id": 126, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 25, "type": "multiple", "question": "（多選）以下哪項為並列結構？(1-19)（   ）", "options": [{"letter": "A", "text": "智能"}, {"letter": "B", "text": "霸業"}, {"letter": "C", "text": "險塞"}, {"letter": "D", "text": "信義"}, {"letter": "E", "text": "存恤"}], "answer": "ACDE"}, {"id": 127, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 26, "type": "multiple", "question": "（多選）以下哪幾項括弧中的字是仄聲？(1-19)（   ）", "options": [{"letter": "A", "text": "漢室可（興）矣"}, {"letter": "B", "text": "以向（宛）洛"}, {"letter": "C", "text": "簞（食）壺漿"}, {"letter": "D", "text": "欲（信）大義於天下"}, {"letter": "E", "text": "（將）荊州之軍"}], "answer": "CE"}, {"id": 128, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 27, "type": "multiple", "question": "（多選）以下含有詞性活用的選項是：(1-19)（   ）", "options": [{"letter": "A", "text": "簞食壺漿"}, {"letter": "B", "text": "此殆天所以資將軍"}, {"letter": "C", "text": "與亮情好日密"}, {"letter": "D", "text": "漢室可興矣"}], "answer": "AC"}, {"id": 129, "category": "文课", "section": "1-14~19 文课练习-《隆中對》", "num": 28, "type": "single", "question": "以下說法【不】正確的是：(1-19)（   ）", "options": [{"letter": "A", "text": "《魏略》是魏国人修的私史"}, {"letter": "B", "text": "張魯是張天師"}, {"letter": "C", "text": "吳會是孫權治下的一個郡"}, {"letter": "D", "text": "劉備稱帝后，定國號為漢"}, {"letter": "E", "text": "巴蜀是巴郡和蜀郡，與漢中郡同為益州治下"}], "answer": "C"}, {"id": 130, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 1, "type": "single", "question": "以下哪項成語典故與陶侃有關？（   ）", "options": [{"letter": "A", "text": "龍山落帽、哭竹生筍。"}, {"letter": "B", "text": "朝暮運甓木屑竹頭。"}, {"letter": "C", "text": "公田種秫、葛巾漉酒。"}, {"letter": "D", "text": "無弦琴、不為五斗米折腰"}], "answer": "B"}, {"id": 131, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 2, "type": "single", "question": "\"靖節\"是陶淵明的:（   ）", "options": [{"letter": "A", "text": "名"}, {"letter": "B", "text": "字"}, {"letter": "C", "text": "號"}, {"letter": "D", "text": "謚"}], "answer": "D"}, {"id": 132, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 3, "type": "single", "question": "《陶徵士誄》的作者是：（   ）", "options": [{"letter": "A", "text": "陶淵明"}, {"letter": "B", "text": "孟嘉"}, {"letter": "C", "text": "顏延之"}, {"letter": "D", "text": "朱光潛"}], "answer": "C"}, {"id": 133, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 4, "type": "single", "question": "以下哪一項不是陶淵明的作品？（   ）", "options": [{"letter": "A", "text": "《晉故征西大將軍長史孟府君傳》"}, {"letter": "B", "text": "《命子》《責子》《乞食》"}, {"letter": "C", "text": "《歸去來兮辭》《五柳先生傳》"}, {"letter": "D", "text": "《隱逸傳》《愛蓮說》"}], "answer": "D"}, {"id": 134, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 5, "type": "single", "question": "以下說法正確的是：（1-21）（   ）", "options": [{"letter": "A", "text": "肌肉滿莊凸起處的穴位就是俞"}, {"letter": "B", "text": "大黃和魚腥草都是鹹味藥"}, {"letter": "C", "text": "桃仁的功用是活血化瘀、溫經通脈"}, {"letter": "D", "text": "一補心一補腎的雙味藥稱為\"相須\""}], "answer": "B"}, {"id": 135, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 6, "type": "single", "question": "以下正體字正確的是：（1-21）（   ）", "options": [{"letter": "A", "text": "複興"}, {"letter": "B", "text": "漏谷"}, {"letter": "C", "text": "血捨魂"}, {"letter": "D", "text": "後溪"}], "answer": "B"}, {"id": 136, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 7, "type": "single", "question": "以下哪項【不】都是並列結構？（1-21）（   ）", "options": [{"letter": "A", "text": "繽紛 遠近"}, {"letter": "B", "text": "華英 跬步"}, {"letter": "C", "text": "谿谷 才干"}, {"letter": "D", "text": "开朗俞穴"}], "answer": "A"}, {"id": 137, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 8, "type": "single", "question": "以下【不】是聯綿詞的是（   ）", "options": [{"letter": "A", "text": "仿佛"}, {"letter": "B", "text": "開朗"}, {"letter": "C", "text": "蒼涼"}, {"letter": "D", "text": "繽紛"}], "answer": "B"}, {"id": 138, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 9, "type": "single", "question": "以下朝代按時間排序正確的是（   ）", "options": [{"letter": "A", "text": "前秦嬴秦 趙宋劉宋"}, {"letter": "B", "text": "前秦嬴秦劉宋 趙宋"}, {"letter": "C", "text": "嬴秦 前秦 趙宋劉宋"}, {"letter": "D", "text": "嬴秦 前秦劉宋 趙宋"}], "answer": "D"}, {"id": 139, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 10, "type": "single", "question": "桃花源中人為何來此？（   ）", "options": [{"letter": "A", "text": "避秦之亂"}, {"letter": "B", "text": "避魏之亂"}, {"letter": "C", "text": "避晉之亂"}, {"letter": "D", "text": "避宋之亂"}], "answer": "A"}, {"id": 140, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 11, "type": "single", "question": "作為日常食用之物，屬於水果的是（   ）", "options": [{"letter": "A", "text": "荸薺"}, {"letter": "B", "text": "桑葚"}, {"letter": "C", "text": "山藥"}, {"letter": "D", "text": "核桃"}], "answer": "B"}, {"id": 141, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 12, "type": "single", "question": "以下哪項【不】都是並列詞？（   ）", "options": [{"letter": "A", "text": "辭去 桑竹 問訊"}, {"letter": "B", "text": "種作 酒食 衣著"}, {"letter": "C", "text": "阡陌  平曠垂髫"}, {"letter": "D", "text": "妻子  歎惋  齠齔"}], "answer": "C"}, {"id": 142, "category": "文课", "section": "20~22 文课练习-《桃花源记》", "num": 13, "type": "single", "question": "\"論\"的發音，以下哪項是仄聲？（   ）", "options": [{"letter": "A", "text": "論語"}, {"letter": "B", "text": "無論魏晉"}, {"letter": "C", "text": "論列是非"}, {"letter": "D", "text": "陰陽應象大論"}], "answer": "D"}];
+let pool = DATA, cur = [], idx = 0, ans = {}, mode = 'all', cat = 'all', subm = false;
+
+function selCat(el, c) {
+  document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  cat = c;
+  let f = DATA;
+  if (cat !== 'all') f = f.filter(q => q.category === cat);
+  document.getElementById('cAll').textContent = f.length + '题';
+}
+function selMode(el, m) {
+  document.querySelectorAll('.mode-card').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  mode = m;
+}
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function start() {
+  let p = DATA;
+  if (cat !== 'all') p = p.filter(q => q.category === cat);
+  if (mode === 'r30') cur = shuffle(p.slice()).slice(0, 30);
+  else if (mode === 'r50') cur = shuffle(p.slice()).slice(0, 50);
+  else cur = p.slice();
+  idx = 0; ans = {}; subm = false;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  render();
+}
+function tlab(t) {
+  return t === 'true_false' ? '判断题' : t === 'single' ? '单选题' : t === 'multiple' ? '多选题' : t === 'fill_blank' ? '填空题' : '题';
+}
+function render() {
+  let q = cur[idx], h = '';
+  document.getElementById('prog').textContent = (idx + 1) + ' / ' + cur.length;
+  document.getElementById('pfill').style.width = ((idx + 1) / cur.length * 100) + '%';
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').classList.add('hidden');
+  document.getElementById('subBtn').classList.remove('hidden');
+  subm = false;
+
+  h += '<div class="meta">' + q.category + ' · ' + q.section + ' 第' + q.num + '题 · ' + tlab(q.type) + '</div>';
+  h += '<div class="question">' + esc(q.question) + '</div>';
+  let s = ans[q.id];
+
+  if (q.type === 'true_false') {
+    h += '<div style="display:flex;gap:10px;">';
+    h += '<button class="btn ' + (s === 'true' ? 'selected' : '') + '" style="flex:1;padding:14px;" onclick="stf('true',this)">✓ 正确</button>';
+    h += '<button class="btn ' + (s === 'false' ? 'selected' : '') + '" style="flex:1;padding:14px;" onclick="stf('false',this)">✗ 错误</button>';
+    h += '</div>';
+  } else if (q.type === 'fill_blank') {
+    h += '<input type="text" placeholder="请输入答案..." value="' + (s || '') + '" oninput="sfill(this.value)" onkeydown="if(event.key==='Enter')submit()">';
+  } else {
+    h += '<div>';
+    q.options.forEach((o, i) => {
+      let sel = s && s.includes(o.letter);
+      h += '<button class="option-btn ' + (sel ? 'selected' : '') + '" onclick="stog('' + o.letter + '',this)">';
+      h += '<b style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;background:#e5e7eb;border-radius:4px;margin-right:8px;font-size:12px;">' + o.letter + '</b>';
+      h += esc(o.text) + '</button>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="answer-box" id="abox"></div>';
+  document.getElementById('qbox').innerHTML = h;
+}
+function stf(v, el) {
+  if (subm) return;
+  ans[cur[idx].id] = v;
+  document.querySelectorAll('#qbox .btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function sfill(v) {
+  if (subm) return;
+  ans[cur[idx].id] = v.trim();
+}
+function stog(l, el) {
+  if (subm) return;
+  let q = cur[idx], s = ans[q.id] || [];
+  if (q.type === 'single') {
+    s = [l];
+    document.querySelectorAll('.option-btn').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+  } else {
+    if (s.includes(l)) { s = s.filter(x => x !== l); el.classList.remove('selected'); }
+    else { s.push(l); s.sort(); el.classList.add('selected'); }
+  }
+  ans[q.id] = s;
+}
+function check(q, s) {
+  if (q.type === 'true_false') return s === q.answer;
+  if (q.type === 'fill_blank') return (s || '').toLowerCase() === (q.answer || '').toLowerCase();
+  if (q.type === 'single') return s && s[0] === q.answer;
+  if (q.type === 'multiple') return q.answer.split('').sort().join('') === (s || []).slice().sort().join('');
+  return false;
+}
+function submit() {
+  let q = cur[idx], s = ans[q.id];
+  if (!s || (Array.isArray(s) && s.length === 0) || (typeof s === 'string' && !s)) {
+    alert('请先作答'); return;
+  }
+  subm = true;
+  let ok = check(q, s), r = '';
+
+  if (q.type === 'true_false') {
+    r = '正确答案：' + (q.answer === 'true' ? '✓ 正确' : '✗ 错误');
+    document.querySelectorAll('#qbox .btn').forEach(b => {
+      if (b.textContent.includes('正确') && q.answer === 'true') b.classList.add('correct');
+      if (b.textContent.includes('错误') && q.answer === 'false') b.classList.add('correct');
+      if (b.classList.contains('selected') && !b.classList.contains('correct')) b.classList.add('wrong');
+    });
+  } else if (q.type === 'fill_blank') {
+    r = '正确答案：' + esc(q.answer);
+  } else {
+    r = '正确答案：' + q.answer.split('').join('、');
+    q.options.forEach((o, i) => {
+      let el = document.querySelectorAll('.option-btn')[i];
+      if (q.answer.includes(o.letter)) el.classList.add('correct');
+      else if (s && s.includes(o.letter)) el.classList.add('wrong');
+    });
+  }
+  document.getElementById('abox').innerHTML = r;
+  document.getElementById('abox').classList.add('show');
+  document.getElementById('subBtn').classList.add('hidden');
+  document.getElementById('nextBtn').classList.remove('hidden');
+  if (idx === cur.length - 1) {
+    document.getElementById('nextBtn').textContent = '查看成绩';
+    document.getElementById('nextBtn').onclick = results;
+  } else {
+    document.getElementById('nextBtn').textContent = '下一题';
+    document.getElementById('nextBtn').onclick = next;
+  }
+}
+function prev() { if (idx > 0) { idx--; render(); } }
+function next() { if (idx < cur.length - 1) { idx++; render(); } }
+function results() {
+  let c = 0, w = 0, wl = [];
+  cur.forEach(q => {
+    let s = ans[q.id];
+    if (!s) { w++; wl.push({q, u: '未作答'}); return; }
+    if (check(q, s)) c++;
+    else {
+      w++;
+      let us = q.type === 'true_false' ? (s === 'true' ? '正确' : '错误') : q.type === 'fill_blank' ? s : s.join('、');
+      wl.push({q, u: us});
+    }
+  });
+  document.getElementById('scoreNum').textContent = Math.round(c / cur.length * 100);
+  document.getElementById('sCorrect').textContent = c;
+  document.getElementById('sWrong').textContent = w;
+  document.getElementById('sTotal').textContent = cur.length;
+
+  let h = '';
+  if (wl.length === 0) {
+    h = '<div class="card center"><p style="color:#10b981;font-weight:600;font-size:16px;">🎉 全部正确！</p></div>';
+  } else {
+    h = '<div class="card"><h3 style="font-size:15px;margin-bottom:12px;">错题回顾</h3>';
+    wl.slice(0, 20).forEach(x => {
+      let a = x.q.type === 'true_false' ? (x.q.answer === 'true' ? '正确' : '错误') : x.q.type === 'fill_blank' ? x.q.answer : x.q.answer.split('').join('、');
+      h += '<div class="wrong-item">';
+      h += '<div class="wrong-meta">' + x.q.category + ' · ' + x.q.section + ' 第' + x.q.num + '题</div>';
+      h += '<div class="wrong-q">' + esc(x.q.question) + '</div>';
+      h += '<div class="wrong-ans">你的答案：<span class="ans-bad">' + esc(String(x.u)) + '</span> &nbsp;|&nbsp; 正确答案：<span class="ans-ok">' + esc(a) + '</span></div>';
+      h += '</div>';
+    });
+    if (wl.length > 20) h += '<p style="text-align:center;color:#9ca3af;font-size:13px;">还有 ' + (wl.length - 20) + ' 道错题未显示</p>';
+    h += '</div>';
+  }
+  document.getElementById('reviewBox').innerHTML = h;
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+}
+function restart() {
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+}
+function esc(t) {
+  if (!t) return '';
+  let d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
